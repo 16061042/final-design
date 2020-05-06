@@ -1,9 +1,51 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "学习圈"
+			}
+		},
+		{
+			"path": "pages/index/home",
+			"style": {
+				"navigationBarTitleText": "学习圈"
+			}
+		},
+		{
+			"path": "pages/circle/circle-detail",
+			"style": {
+				"navigationBarTitleText": "圈子详情"
+			}
+		},
+		{
+			"path": "pages/mine/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/mine/register",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/question/question",
+			"style": {
+				"navigationBarTitleText": "答题"
+			}
+		},
+		{
+			"path": "pages/question/createTitle",
+			"style": {
+				"navigationBarTitleText": "创建题目"
+			}
+		},
+		{
+			"path": "pages/mine/myMessage",
+			"style": {
+				"navigationBarTitleText": "我的"
 			}
 		}
 	],
@@ -12,5 +54,32 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar":{
+		"color":"#8a8a8a",
+		"selectedColor":"#d4237a",
+		"borderStyle":"black",
+		"backgroundColor":"#ffffff",
+		"list": [
+			{
+				"pagePath":"pages/index/home",
+				"text":"首页",
+				"iconPath":"static/icon1.png",
+				"selectedIconPath":"static/icon1.png"
+			},
+			{
+				"pagePath":"pages/question/createTitle",
+				"text":"创建题目",
+				"iconPath":"static/icon2.png",
+				"selectedIconPath":"static/icon2.png"
+			},
+			{
+				"pagePath":"pages/mine/myMessage",
+				"text":"我的",
+				"iconPath":"static/icon1.png",
+				"selectedIconPath":"static/icon2.png"
+			}
+		]
+
 	}
 }

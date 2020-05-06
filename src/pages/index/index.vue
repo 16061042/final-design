@@ -1,42 +1,48 @@
 <template>
 	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view>
-			<text class="title">{{title}}</text>
-		</view>
+		<view>业精于勤荒于嬉</view>
+		<button @click="toHome">进入学习圈</button>
 	</view>
+
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				title: 'Hello'
-			}
-		},
-		onLoad() {
-
-		},
-		methods: {
-
+export default {
+	data() {
+		return {
+		
 		}
+	},
+	onLoad() {
+
+	},
+	methods: {
+		toHome:function(){
+			uni.switchTab({
+				url:'/pages/index/home'
+			})
+		},
+		
 	}
+}
 </script>
 
 <style>
 	.content {
+		background-color: #fff;
 		text-align: center;
-		height: 400upx;
+		height: 760rpx;
+		position: relative;
+	}
+	button{
+		position: absolute;
+		left: 10%;
+		right: 10%;
+		bottom: 30%;
+		background-color: green;
+		width: 80%;
+		z-index: 999;
 	}
 
-	.logo {
-		height: 200upx;
-		width: 200upx;
-		margin-top: 200upx;
-	}
-
-	.title {
-		font-size: 36upx;
-		color: #8f8f94;
-	}
+	
 </style>

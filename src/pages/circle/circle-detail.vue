@@ -1,18 +1,18 @@
 <template>
 	<view class="content">
 		  <view class="topBlock">
-                <image src='../../static/c.png'></image>
+                <image :src="circleInfo.imgUrl"></image>
                 <div>
-                    <p class="title">{{item.name}}</p>
-                    <p>{{item.memberCount}}个成员 | {{item.questionCount}}题目</p>
+                    <p class="title">{{circleInfo.title}}</p>
+                    <p>{{circleInfo.memCount}}个成员 | {{circleInfo.questionCount}}题目</p>
                    
                 </div>
-                 <div class="join" @click="join">加入</div>
-                
+                <div class="join" @click="join" v-if="!circleInfo.hasJoin">加入</div>
+                <div class="join" v-else @click="quit">退出</div>
             </view>
             <view class="introduce">
                 <p class="introTitle">简介</p>
-                <p style="text-indent: 40px;">{{item.introduce}}</p>
+                <p style="text-indent: 40px;">{{circleInfo.content}}</p>
 	        </view>
             <view class="finished">
                 <p class="introTitle">题目</p>
@@ -34,16 +34,12 @@
 </template>
 
 <script>
+import toolkit from '../../util/toolkit'
 export default {
 	data() {
 		return {
-            item: {
-                id:3,
-                name:'测试3',
-                memberCount:999,
-                questionCount:8585767,
-                introduce:'C语言是一门面向过程的、抽象化的通用程序设计语言，广泛应用于底层开发。C语言能以简易的方式编译、处理低级存储器。C语言是仅产生少量的机器语言以及不需要任何运行环境支持便能运行的高效率程序设计语言。尽管C语言提供了许多低级处理的功能，但仍然保持着跨平台的特性，以一个标准规格写出的C语言程序可在包括类似嵌入式处理器以及超级计算机等作业平台的许多计算机平台上进行编译。'
-            },
+            circleId: '',
+            circleInfo: {},
             finishList: [{
                 id: 1,
                 title: '二进制转换'
@@ -60,22 +56,123 @@ export default {
             }]
 		}
 	},
-	onLoad() {
-
-	},
+	mounted(){
+        this.circleId = this.$route.query.id
+        this.circleId && this.getCircle()
+    },
 	methods: {
+        getCircle(){
+            let par = {
+                circleId: this.circleId
+            }
+            uni.getStorage({
+                key: 'userId',
+                success(e) {
+                    par.userId = e.data
+                }
+            })
+            toolkit.post('/circle/getCircle', par).then(res => {
+                res = res.data
+                if(res.code == 0) {
+                   this.circleInfo = res.data
+                } else {
+                    uni.showToast({
+                        icon: "none",
+                        title: res.message,
+                        duration: 2000
+                    })
+                }
+            })
+        },
         join(){
-          uni.showModal({
-            title: '提示',
-            content: '确定加入吗',
-            success: function (res) {
-            if (res.confirm) {
-                console.log('用户点击确定');
-            } else if (res.cancel) {
-                console.log('用户点击取消');
-            }
-            }
-});
+            let that = this
+            // 先判断用户是否登录
+            uni.getStorage({
+                key: 'userId',
+                success(e) {
+                    let userId = e.data
+                    uni.showModal({
+                        content: '确定加入圈子吗?',
+                        success: function (res) {
+                            if (res.confirm) {
+                                let par = {
+                                    circleId: that.circleId,
+                                    userId: userId
+                                }
+                                toolkit.post('/circle/joinCircle', par).then(res => {
+                                    res = res.data
+                                    if(res.code == 0) {
+                                        uni.showToast({
+                                            icon: 'success',
+                                            title: '加入成功',
+                                            duration: 1000
+                                        })
+                                        that.getCircle()
+                                    } else {
+                                        uni.showToast({
+                                            icon: 'none',
+                                            title: res.message,
+                                            duration: 1000
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                    })
+                },
+                fail() {
+                    uni.showModal({
+                        content: '您未登录，请登录',
+                        showCancel: false,
+                        confirmText: '登录',
+                        success: function (res) {
+                            if (res.confirm) {
+                                uni.navigateTo({
+                                    url: '/pages/mine/login'
+                                })
+                            }
+                        }
+                    });
+                }
+            })
+        },
+        quit() {
+            let that = this
+            // 先判断用户是否登录
+            uni.getStorage({
+                key: 'userId',
+                success(e) {
+                    let userId = e.data
+                    uni.showModal({
+                        content: '确定退出圈子吗?',
+                        success: function (res) {
+                            if (res.confirm) {
+                                let par = {
+                                    circleId: that.circleId,
+                                    userId: userId
+                                }
+                                toolkit.post('/circle/quitCircle', par).then(res => {
+                                    res = res.data
+                                    if(res.code == 0) {
+                                        uni.showToast({
+                                            icon: 'success',
+                                            title: '退出成功',
+                                            duration: 1000
+                                        })
+                                        that.getCircle()
+                                    } else {
+                                        uni.showToast({
+                                            icon: 'none',
+                                            title: res.message,
+                                            duration: 1000
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            })
         },
         toQuestion(){
              uni.navigateTo({

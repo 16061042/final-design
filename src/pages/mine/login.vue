@@ -2,30 +2,65 @@
 	<view class="content">
         <view class="input input1">
             <label>学号</label>
-		    <input type="number" maxlength="10" minlength="8" placeholder="请填入学号">
+		    <input placeholder="请填入学号" v-model="account">
         </view>
         <view class="input">
             <label>密码</label>
-		    <input type="text" minlength="6" maxlength="10" placeholder="请填入密码">
+		    <input type="password" v-model="password" placeholder="请填入密码">
         </view>
        
-        <button>登录</button>
+        <button @click="login">登录</button>
         <button @click="toredister">注册</button>
 	</view>
 	
 </template>
 
 <script>
+import toolkit from '../../util/toolkit'
 export default{
 	data(){
 		return{
-
+            account: '',
+            password: ''
 		}
     },
     methods:{
         toredister(){
             uni.navigateTo({
                 url: '/pages/mine/register'
+            })
+        },
+        login(){
+            let par= {
+                account: this.account,
+                passWord: this.password
+            }
+            toolkit.post('/user/login', par).then(res => {
+                res = res.data
+                if(res.code == 0){
+                    uni.showToast({
+                        icon: "success",
+                        title: '登录成功',
+                        duration: 1000
+                    })
+                    setTimeout(() => {
+                        uni.setStorage({
+                            key: 'userId',
+                            data: res.data.userId,
+                            success: function () {
+                                uni.switchTab({
+                                    url: '/pages/index/home'
+                                })
+                            }
+                        })
+                    }, 1000)
+                } else {
+                    uni.showToast({
+                        icon: "none",
+                        title: res.message,
+                        duration: 2000
+                    })
+                }
             })
         }
     }

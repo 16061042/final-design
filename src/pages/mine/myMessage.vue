@@ -5,8 +5,8 @@
                 <image src='../../static/c.png'></image>
             </view>
             <view class="message">
-                <p>{{message.name}}</p>
-                <p>{{message.studentID}}</p>
+                <p>{{info.userName}}</p>
+                <p>{{info.userPhone}}</p>
             </view>
             <view class="more">></view>
         </view>
@@ -19,15 +19,36 @@ import toolkit from '../../util/toolkit'
 export default{
 	data(){
 		return{
-            message:{
-                name:'lishunxin',
-                studentID:'05168956'
-            }
+            userId: '',
+            info: {},
 		}
 	},
-	mounted(){
-		
-	}
+	onShow(){
+        let that = this
+        uni.getStorage({
+            key: 'userId',
+            success(e) {
+                this.userId = e.data
+                toolkit.post('/user/getInfo',{userId: this.userId}).then(res => {
+                    res = res.data
+                    if(res.code == 0) {
+                        that.info = res.data
+                    } else {
+                        uni.showToast({
+                            icon: 'none',
+                            title: res.message,
+                            duration: 2000
+                        })
+                    }
+                })
+            },
+            fail() {
+                uni.navigateTo({
+                    url: '/pages/mine/login'
+                })
+            }
+        })
+    }
 }
 </script>
 

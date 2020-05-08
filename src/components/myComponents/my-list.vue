@@ -5,15 +5,15 @@
             <span class="allList">全部 ></span>
         </view>
        
-		<ul v-for='item in list' :key='item.id'>
+		<ul v-for='(item, index) of circleList' :key='item.circleId'>
             <li>
-                <span>{{item.id}}</span>
-                <image src='../../static/c.png'></image>
+                <span>{{index + 1}}</span>
+                <image :src="item.imgUrl"></image>
                 <div>
-                    <p>{{item.name}}</p>
-                    <p>{{item.memberCount}}个成员 | {{item.questionCount}}题目</p>
+                    <p>{{item.title}}</p>
+                    <p>{{item.memCount}}个成员 | {{item.questionCount}}题目</p>
                 </div>
-                <div class="join" @click="toDetail">详情</div>
+                <div class="join" @click="toDetail(item.circleId)">详情</div>
             </li>
            
         </ul>
@@ -24,36 +24,21 @@
 
 <script>
 export default{
+    props: {
+        circleList: {
+            type: Array,
+            default: []
+        }
+    },
     data(){
         return{
-            title:'热门优选榜',
-            list:[
-                {
-                    id:1,
-                    name:'测试1',
-                    memberCount:999,
-                    questionCount:8888
-                },
-                {
-                    id:2,
-                    name:'测试2',
-                     memberCount:999,
-                     questionCount:99885
-                },
-                {
-                    id:3,
-                    name:'测试3',
-                    memberCount:999,
-                    questionCount:8585767
-                }
-            ]
+            title:'热门优选榜'
         }
-
     },
     methods: {
-        toDetail(){
+        toDetail(id){
             uni.navigateTo({
-                url: '/pages/circle/circle-detail'
+                url: '/pages/circle/circle-detail?id=' + id
             })
         }
     }

@@ -1,17 +1,17 @@
 <template>
 	<view class="content">
 		<swiper indicator-dots autoplay="true" interval='3000' circular>
-			<swiper-item>
-				<image src="../../static/c.png"></image>
+			<swiper-item @click="toDetail(circleList[0].circleId)">
+				<image :src="circleList[0].imgUrl"></image>
 			</swiper-item>
-			<swiper-item>
-				<image src="../../static/dianlu.jpg"></image>
+			<swiper-item @click="toDetail(circleList[1].circleId)">
+				<image :src="circleList[1].imgUrl"></image>
 			</swiper-item>
-			<swiper-item>
-				<image src="../../static/dianlu.jpg"></image>
+			<swiper-item @click="toDetail(circleList[2].circleId)">
+				<image :src="circleList[2].imgUrl"></image>
 			</swiper-item>
 		</swiper>
-		<myList></myList>
+		<myList :circleList="circleList"></myList>
 	</view>
 	
 </template>
@@ -23,13 +23,29 @@ export default{
 	components: {myList},
 	data(){
 		return{
-
+			circleList: []
 		}
 	},
 	mounted(){
 		toolkit.post("/circle/getCommonList").then(res => {
-			console.log(res)
+			res = res.data
+			if(res.code == 0) {
+				this.circleList = res.data
+			} else {
+				uni.showToast({
+					icon: "none",
+					title: res.message,
+					duration: 2000
+				})
+			}
 		})
+	},
+	methods: {
+		toDetail(id) {
+			uni.navigateTo({
+                url: '/pages/circle/circle-detail?id=' + id
+            })
+		}
 	}
 }
 </script>

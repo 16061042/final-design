@@ -47,6 +47,12 @@
 			"style": {
 				"navigationBarTitleText": "我的"
 			}
+		},
+		{
+			"path": "pages/mine/info",
+			"style": {
+				"navigationBarTitleText": "修改信息"
+			}
 		}
 	],
 	"globalStyle": {

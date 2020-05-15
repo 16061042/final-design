@@ -8,6 +8,7 @@
                    
                 </div>
                 <div class="join" @click="join" v-if="!circleInfo.hasJoin">加入</div>
+                <div class="join" v-else-if="userId == circleInfo.userId" @click="del">删除</div>
                 <div class="join" v-else @click="quit">退出</div>
             </view>
             <view class="introduce">
@@ -29,6 +30,7 @@
                     </li>
                 </ul>
             </view>
+            <button v-if="userId == circleInfo.userId">添加题目</button>
 	</view>
 
 </template>
@@ -53,10 +55,18 @@ export default {
             },{
                  id: 2,
                 title: '二进制转换'
-            }]
+            }],
+            userId: ''
 		}
 	},
 	mounted(){
+        let that = this
+        uni.getStorage({
+            key: 'userId',
+            success(e) {
+                that.userId = e.data
+            }
+        })
         this.circleId = this.$route.query.id
         this.circleId && this.getCircle()
     },
@@ -174,6 +184,46 @@ export default {
                 }
             })
         },
+        del() {
+            let that = this
+            // 先判断用户是否登录
+            uni.getStorage({
+                key: 'userId',
+                success(e) {
+                    let userId = e.data
+                    uni.showModal({
+                        content: '确定删除圈子吗?',
+                        success: function (res) {
+                            if (res.confirm) {
+                                let par = {
+                                    circleId: that.circleId,
+                                    userId: userId
+                                }
+                                toolkit.post('/circle/delCircle', par).then(res => {
+                                    res = res.data
+                                    if(res.code == 0) {
+                                        uni.showToast({
+                                            icon: 'success',
+                                            title: '删除成功',
+                                            duration: 1000
+                                        })
+                                        setTimeout(() => {
+                                            uni.navigateBack()
+                                        }, 1000)
+                                    } else {
+                                        uni.showToast({
+                                            icon: 'none',
+                                            title: res.message,
+                                            duration: 1000
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+        },
         toQuestion(){
              uni.navigateTo({
                 url: '/pages/question/question'
@@ -185,6 +235,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    button{
+        width: 30%;
+        height: 40px;
+        background-color: green;
+        line-height: 40px;
+        margin-top: 20px;
+    }
 	.content {
 		background-color: #fff;
 		text-align: center;

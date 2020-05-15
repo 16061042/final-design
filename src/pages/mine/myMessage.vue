@@ -1,8 +1,9 @@
 <template>
 	<view class="content">
-		<view class="mineTop">
+		<view class="mineTop" @click="toInfo">
             <view class="pic">
-                <image src='../../static/c.png'></image>
+                <image src='../../static/default.jpg' v-if="!info.img"></image>
+                <image :src="info.img" v-else></image>
             </view>
             <view class="message">
                 <p>{{info.userName}}</p>
@@ -10,17 +11,24 @@
             </view>
             <view class="more">></view>
         </view>
+        <myList :circleList="circleList" :myTitle="listTitle"></myList>
 	</view>
 	
 </template>
 
 <script>
+import myList from '../../components/myComponents/my-list'
 import toolkit from '../../util/toolkit'
 export default{
+    components: {
+        myList
+    },
 	data(){
 		return{
             userId: '',
             info: {},
+            circleList: [],
+            listTitle: '我参与的圈子'
 		}
 	},
 	onShow(){
@@ -41,6 +49,19 @@ export default{
                         })
                     }
                 })
+                // 我参与的圈子
+                toolkit.post('/circle/getMyCircle',{userId: this.userId}).then(res => {
+                    res = res.data
+                    if(res.code == 0) {
+                        that.circleList = res.data
+                    } else {
+                        uni.showToast({
+                            icon: 'none',
+                            title: res.message,
+                            duration: 2000
+                        })
+                    }
+                })
             },
             fail() {
                 uni.navigateTo({
@@ -48,15 +69,21 @@ export default{
                 })
             }
         })
+    },
+    methods: {
+        toInfo(){
+            uni.navigateTo({
+                url: '/pages/mine/info'
+            })
+        }
     }
 }
 </script>
 
 <style lang="scss" scoped>
 	.content {
-		background-color: rgb(235, 235, 235);
+        height: 100%;
 		text-align: center;
-		height: 760rpx;
 		position: relative;
         color: rgb(193, 193, 193);
 	}

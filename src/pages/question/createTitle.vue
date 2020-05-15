@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
         <view class="topbar">     
-            <Myeditor></Myeditor>   
+            <Myeditor @setData="setData"></Myeditor>   
         </view>	 
         <button class="submit"  @click="open">提交</button>
 	</view>
@@ -15,30 +15,35 @@ export default {
     components: {uniIcons,  Myeditor},
 	data() {
 		return {
-           
+           question: ''
 		}
 	},
 	onLoad() {
 	},
 	methods: {
-       open(){
-         uni.showModal({
-            title: '提示',
-            content: '确认提交？',
-            success: function (res) {
-                if (res.confirm) {
-                    console.log('用户点击确定');
-                } else if (res.cancel) {
-                    console.log('用户点击取消');
-                }
+        setData(val) {
+            if(typeof(val) != "undefined") {
+                this.question = val
             }
-        });
+        },
+        open(){
+            let that = this
+            uni.showModal({
+                title: '提示',
+                content: '确认提交？',
+                success: function (res) {
+                    if (res.confirm) {
+                        console.log(that.question)
+                    } else if (res.cancel) {
+                    }
+                }
+            });
       },
        onEditorReady() {
-                uni.createSelectorQuery().select('#editor').context((res) => {
-                    this.editorCtx = res.context
-                }).exec()
-            },
+            uni.createSelectorQuery().select('#editor').context((res) => {
+                this.editorCtx = res.context
+            }).exec()
+        },
 		
 	}
 }

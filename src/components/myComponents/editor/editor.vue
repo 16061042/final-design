@@ -6,7 +6,7 @@
 					<view :class="formats.bold ? 'ql-active' : ''" class="iconfont icon-zitijiacu" data-name="bold"></view>
 					<view :class="formats.italic ? 'ql-active' : ''" class="iconfont icon-zitixieti" data-name="italic"></view>
 					<view :class="formats.underline ? 'ql-active' : ''" class="iconfont icon-zitixiahuaxian" data-name="underline"></view>
-					<view :class="formats.strike ? 'ql-active' : ''" class="iconfont icon-zitishanchuxian" data-name="strike"></view>
+					<!-- <view :class="formats.strike ? 'ql-active' : ''" class="iconfont icon-zitishanchuxian" data-name="strike"></view> -->
 					<view :class="formats.align === 'left' ? 'ql-active' : ''" class="iconfont icon-zuoduiqi" data-name="align"
 					 data-value="left"></view>
 					<view :class="formats.align === 'center' ? 'ql-active' : ''" class="iconfont icon-juzhongduiqi" data-name="align"
@@ -15,9 +15,9 @@
 					 data-value="right"></view>
 					<view :class="formats.align === 'justify' ? 'ql-active' : ''" class="iconfont icon-zuoyouduiqi" data-name="align"
 					 data-value="justify"></view>
-					<view :class="formats.lineHeight ? 'ql-active' : ''" class="iconfont icon-line-height" data-name="lineHeight"
-					 data-value="2"></view>
-					<view :class="formats.letterSpacing ? 'ql-active' : ''" class="iconfont icon-Character-Spacing" data-name="letterSpacing"
+					<!-- <view :class="formats.lineHeight ? 'ql-active' : ''" class="iconfont icon-line-height" data-name="lineHeight"
+					 data-value="2"></view> -->
+					<!-- <view :class="formats.letterSpacing ? 'ql-active' : ''" class="iconfont icon-Character-Spacing" data-name="letterSpacing"
 					 data-value="2em"></view>
 					<view :class="formats.marginTop ? 'ql-active' : ''" class="iconfont icon-722bianjiqi_duanqianju" data-name="marginTop"
 					 data-value="20px"></view>
@@ -44,9 +44,9 @@
 
 					<view class="iconfont icon-outdent" data-name="indent" data-value="-1"></view>
 					<view class="iconfont icon-indent" data-name="indent" data-value="+1"></view>
-					<view class="iconfont icon-fengexian" @tap="insertDivider"></view>
+					<view class="iconfont icon-fengexian" @tap="insertDivider"></view> -->
 					<view class="iconfont icon-charutupian" @tap="insertImage"></view>
-					<view :class="formats.header === 1 ? 'ql-active' : ''" class="iconfont icon-format-header-1" data-name="header"
+					<!-- <view :class="formats.header === 1 ? 'ql-active' : ''" class="iconfont icon-format-header-1" data-name="header"
 					 :data-value="1"></view>
 					<view :class="formats.script === 'sub' ? 'ql-active' : ''" class="iconfont icon-zitixiabiao" data-name="script"
 					 data-value="sub"></view>
@@ -54,12 +54,12 @@
 					 data-value="super"></view>
 					<view class="iconfont icon-shanchu" @tap="clear"></view>
 					<view :class="formats.direction === 'rtl' ? 'ql-active' : ''" class="iconfont icon-direction-rtl" data-name="direction"
-					 data-value="rtl"></view>
+					 data-value="rtl"></view> -->
 
 				</view>
 
 				<editor id="editor" class="ql-container" placeholder="开始输入..." showImgSize showImgToolbar showImgResize
-				 @statuschange="onStatusChange" :read-only="readOnly" @ready="onEditorReady">
+				 @statuschange="onStatusChange" :read-only="readOnly" @ready="onEditorReady" @input="editorChange">
 				</editor>
 			</view>
 		</view>
@@ -72,10 +72,14 @@
 		data() {
 			return {
                 readOnly: false,
-				formats: {}
+				formats: {},
+				editorCtx: {}
 			}
 		},
 		methods: {
+			editorChange(e) {
+				this.$emit('setData', e.detail.html)
+			},
 			readOnlyChange() {
 				this.readOnly = !this.readOnly
 			},
@@ -131,13 +135,23 @@
 				uni.chooseImage({
 					count: 1,
 					success: (res) => {
-						this.editorCtx.insertImage({
-							src: res.tempFilePaths[0],
-							alt: '图像',
-							success: function() {
-								console.log('insert image success')
+						uni.request({
+							url: res.tempFilePaths[0],
+							method: 'GET',
+							responseType: 'arraybuffer',
+							success: res => {
+								let base64 = wx.arrayBufferToBase64(res.data); //把arraybuffer转成base64
+								base64 = 'data:image/jpeg;base64,' + base64; //不加上这串字符，在页面无法显示
+								this.editorCtx.insertImage({
+									src: base64,
+									alt: '图像',
+									success: function() {
+										console.log('insert image success')
+									}
+								})
 							}
-						})
+						});
+						
 					}
 				})
 			}

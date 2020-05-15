@@ -1,8 +1,9 @@
 <template>
 	<view class="content">
         <view class="title">
-             <span>{{title}}</span>
-            <span class="allList">全部 ></span>
+            <span v-if="myTitle">{{myTitle}}</span>
+            <span v-else>{{title}}</span>
+            <span class="allList" v-if="!myTitle">全部 ></span>
         </view>
        
 		<ul v-for='(item, index) of circleList' :key='item.circleId'>
@@ -28,11 +29,15 @@ export default{
         circleList: {
             type: Array,
             default: []
+        },
+        myTitle : {
+            type: String,
+            default: ''
         }
     },
     data(){
         return{
-            title:'热门优选榜'
+            title: '热门优选榜'
         }
     },
     methods: {

@@ -4,15 +4,7 @@
             <label>头像</label>
 		    <image src='https://oss.5kong.com/app/test/2020/05/09/42b1e9a989be2a3b4da4605af0a03041.jpg' v-if="!newInfo.img"></image>
             <image :src="newInfo.img" v-else></image>
-            <el-upload
-                class="upload-demo"
-                action="http://account.5kong.com/api/common/uploadOss"
-                :on-success="upload"
-                :file-list="fileList"
-                :show-file-list="false"
-                >
-                <el-button size="small" type="primary">点击上传</el-button>
-            </el-upload>
+            <button @click="upload" class="upload-demo">点击上传</button>
         </view>
         <view class="input input2">
             <label>手机号</label>
@@ -78,22 +70,35 @@ export default{
         })
     },
     methods: {
-       upload(response, file, fileList){
-           this.fileList = []
-           if(response.code == 0){
-               uni.showToast({
-                    icon: 'success',
-                    title: '上传成功',
-                    duration: 1000
-                })
-               this.newInfo.img = response.data.url
-           } else {
-               uni.showToast({
-                   icon: 'none',
-                   title: '上传失败',
-                   duration: 2000
-               })
-           }
+       upload(){
+            let that = this
+            uni.chooseImage({
+                success: function (chooseImageRes) {
+                    const tempFilePaths = chooseImageRes.tempFilePaths;
+                    uni.uploadFile({
+                        url: 'http://account.5kong.com/api/common/uploadOss', 
+                        filePath: tempFilePaths[0],
+                        name: 'file',
+                        success: function (res) {
+                            res = JSON.parse(res.data)
+                            if(res.code == 0) {
+                                that.newInfo.img = res.data.url
+                                uni.showToast({
+                                    icon: "success",
+                                    title: '上传成功',
+                                    duration: 1000
+                                })
+                            } else {
+                                uni.showToast({
+                                    icon: "none",
+                                    title: '上传失败',
+                                    duration: 1000
+                                })
+                            }
+                        }
+                    });
+                }
+            });
        },
        update(){
            if(this.newPwd != this.newConfirm) {

@@ -55,9 +55,8 @@
 					<view class="iconfont icon-shanchu" @tap="clear"></view>
 					<view :class="formats.direction === 'rtl' ? 'ql-active' : ''" class="iconfont icon-direction-rtl" data-name="direction"
 					 data-value="rtl"></view> -->
-
 				</view>
-
+				<record @set="set"></record>
 				<editor id="editor" class="ql-container" placeholder="开始输入..." showImgSize showImgToolbar showImgResize
 				 @statuschange="onStatusChange" :read-only="readOnly" @ready="onEditorReady" @input="editorChange">
 				</editor>
@@ -68,7 +67,11 @@
 </template>
 
 <script>
+import record from "../record"
 	export default {
+		components: {
+			record
+		},
 		data() {
 			return {
                 readOnly: false,
@@ -77,6 +80,11 @@
 			}
 		},
 		methods: {
+			set(val) {
+				this.editorCtx.insertText({
+					text: val
+				})
+			},
 			editorChange(e) {
 				this.$emit('setData', e.detail.html)
 			},
@@ -85,7 +93,7 @@
 			},
 			onEditorReady() {
 				uni.createSelectorQuery().select('#editor').context((res) => {
-					this.editorCtx = res.context
+					this.editorCtx = res && res.context
 				}).exec()
 			},
 			undo() {
@@ -132,26 +140,34 @@
 				})
 			},
 			insertImage() {
+				let that = this
 				uni.chooseImage({
 					count: 1,
 					success: (res) => {
-						uni.request({
-							url: res.tempFilePaths[0],
-							method: 'GET',
-							responseType: 'arraybuffer',
-							success: res => {
-								let base64 = wx.arrayBufferToBase64(res.data); //把arraybuffer转成base64
-								base64 = 'data:image/jpeg;base64,' + base64; //不加上这串字符，在页面无法显示
-								this.editorCtx.insertImage({
-									src: base64,
-									alt: '图像',
-									success: function() {
-										console.log('insert image success')
-									}
-								})
+						const tempFilePaths = res.tempFilePaths;
+						uni.uploadFile({
+							url: 'http://account.5kong.com/api/common/uploadOss', 
+							filePath: tempFilePaths[0],
+							name: 'file',
+							success: function (res) {
+								res = JSON.parse(res.data)
+								if(res.code == 0) {
+									that.editorCtx.insertImage({
+										src: res.data.url,
+										alt: '图像',
+										success: function() {
+											console.log('insert image success')
+										}
+									})
+								} else {
+									uni.showToast({
+										icon: "none",
+										title: '上传失败',
+										duration: 1000
+									})
+								}
 							}
 						});
-						
 					}
 				})
 			}

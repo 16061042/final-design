@@ -4,6 +4,7 @@
             <span v-if="myTitle">{{myTitle}}</span>
             <span v-else>{{title}}</span>
             <span class="allList" v-if="!myTitle">全部 ></span>
+            <button class="new-circle" v-if="role === '0'" @click="toCreate">新建圈子</button>
         </view>
        
 		<ul v-for='(item, index) of circleList' :key='item.circleId'>
@@ -14,7 +15,8 @@
                     <p>{{item.title}}</p>
                     <p>{{item.memCount}}个成员 | {{item.questionCount}}题目</p>
                 </div>
-                <div class="join" @click="toDetail(item.circleId)">详情</div>
+                <div class="join" @click="toDetail(item.circleId)" v-if="userId != item.userId">详情</div>
+                <div class="join" @click="toDetail(item.circleId)" v-else>管理</div>
             </li>
            
         </ul>
@@ -33,6 +35,14 @@ export default{
         myTitle : {
             type: String,
             default: ''
+        },
+        userId: {
+            type: String,
+            default: ''
+        },
+        role: {
+            type: String,
+            default:  ''
         }
     },
     data(){
@@ -44,6 +54,11 @@ export default{
         toDetail(id){
             uni.navigateTo({
                 url: '/pages/circle/circle-detail?id=' + id
+            })
+        },
+        toCreate() {
+            uni.navigateTo({
+                url: '/pages/circle/create-circle'
             })
         }
     }
@@ -100,5 +115,17 @@ export default{
     }
     .allList{
         float: right;
+    }
+    .new-circle {
+        float: right;
+        height: 30px;
+        width: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        background-color: #e0e0e0;
+        color: green;
+        border-radius: 0px;
     }
 </style>

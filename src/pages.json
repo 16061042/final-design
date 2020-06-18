@@ -19,6 +19,12 @@
 			}
 		},
 		{
+			"path": "pages/circle/statistic",
+			"style": {
+				"navigationBarTitleText": "答题统计"
+			}
+		},
+		{
 			"path": "pages/mine/login",
 			"style": {
 				"navigationBarTitleText": "登录"
@@ -37,7 +43,7 @@
 			}
 		},
 		{
-			"path": "pages/question/createTitle",
+			"path": "pages/question/create-question",
 			"style": {
 				"navigationBarTitleText": "创建题目"
 			}
@@ -52,6 +58,36 @@
 			"path": "pages/mine/info",
 			"style": {
 				"navigationBarTitleText": "修改信息"
+			}
+		},
+		{
+			"path": "pages/circle/create-circle",
+			"style": {
+				"navigationBarTitleText": "创建圈子"
+			}
+		},
+		{
+			"path": "pages/comment/index",
+			"style": {
+				"navigationBarTitleText": "讨论"
+			}
+		},
+		{
+			"path": "pages/comment/create",
+			"style": {
+				"navigationBarTitleText": "创建讨论"
+			}
+		},
+		{
+			"path": "pages/comment/detail",
+			"style": {
+				"navigationBarTitleText": "讨论详情"
+			}
+		},
+		{
+			"path": "pages/comment/reply",
+			"style": {
+				"navigationBarTitleText": "回复讨论"
 			}
 		}
 	],
@@ -74,8 +110,8 @@
 				"selectedIconPath":"static/icon1.png"
 			},
 			{
-				"pagePath":"pages/question/createTitle",
-				"text":"创建题目",
+				"pagePath":"pages/comment/index",
+				"text":"讨论",
 				"iconPath":"static/icon2.png",
 				"selectedIconPath":"static/icon2.png"
 			},

@@ -26,7 +26,7 @@ export default{
 			circleList: []
 		}
 	},
-	mounted(){
+	onShow(){
 		toolkit.post("/circle/getCommonList").then(res => {
 			res = res.data
 			if(res.code == 0) {

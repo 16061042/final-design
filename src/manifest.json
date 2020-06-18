@@ -71,5 +71,19 @@
     },
     "mp-qq" : {
         "usingComponents" : true
-    }
+	},
+	"h5": {
+		"devServer": {
+			"port": 8000,
+			"disableHostCheck": true,
+			"proxy": {
+				"/pro_api": {
+					"target": "https://vop.baidu.com",
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite":{"^/pro_api":""}
+				}
+			}
+		}
+	}
 }

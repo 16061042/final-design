@@ -17,20 +17,22 @@
 	        </view>
             <view class="finished">
                 <p class="introTitle">题目</p>
+                <p style="text-align: center;" v-if="finishList.length == 0 && todoList.length == 0">暂无题目数据</p>
                 <ul class="finish">
-                    <li v-for="(item,index) of finishList" :key="item.id">
+                    <li v-for="item of finishList" :key="item.questionId" @click="toDoneQuestion(item.questionId)">
                         <span style="float: left;">{{item.title}}</span>
                         <icon type="success" color="green" size="20" style="float: right;"/>
                     </li>
                 </ul>
                  <ul class="todo">
-                    <li v-for="(item,index) of todoList" :key="item.id" @click="toQuestion">
+                    <li v-for="item of todoList" :key="item.questionId" @click="toQuestion(item.questionId)">
                         <span style="float: left;">{{item.title}}</span>
                         <icon type="waiting" color="orange" size="20" style="float: right;"/>
                     </li>
                 </ul>
             </view>
-            <button v-if="userId == circleInfo.userId">添加题目</button>
+            <button v-if="userId == circleInfo.userId" @click="createQuestion" style="margin-bottom: 20px">添加题目</button>
+            <button v-if="userId == circleInfo.userId" @click="toTong" style="margin-bottom: 20px">答题统计</button>
 	</view>
 
 </template>
@@ -42,24 +44,21 @@ export default {
 		return {
             circleId: '',
             circleInfo: {},
-            finishList: [{
-                id: 1,
-                title: '二进制转换'
-            },{
-                id: 2,
-                title: '二进制转换'
-            }],
-            todoList:[{
-                id:1,
-                title:'十六进制转换'
-            },{
-                 id: 2,
-                title: '二进制转换'
-            }],
+            finishList: [],
+            todoList:[],
             userId: ''
 		}
-	},
-	mounted(){
+    },
+    onLoad(options){
+        this.circleId = options.id
+        let par = {
+            circleId: this.circleId
+        }
+        toolkit.post('/circle/statistics', par).then(res => {
+            console.log(res)
+        })
+    },
+	onShow(){
         let that = this
         uni.getStorage({
             key: 'userId',
@@ -67,8 +66,9 @@ export default {
                 that.userId = e.data
             }
         })
-        this.circleId = this.$route.query.id
+        // this.circleId = this.$route.query.id
         this.circleId && this.getCircle()
+        this.circleId && this.getQuestionList()
     },
 	methods: {
         getCircle(){
@@ -90,6 +90,38 @@ export default {
                         icon: "none",
                         title: res.message,
                         duration: 2000
+                    })
+                }
+            })
+        },
+        toTong() {
+            uni.navigateTo({
+                url: '/pages/circle/statistic?circleId=' + this.circleId
+            })
+        },
+        getQuestionList() {
+            this.todoList = []
+            this.finishList = []
+            let par = {
+                userId: this.userId,
+                circleId: this.circleId
+            }
+            toolkit.post('/question/getQuestionList', par).then(res => {
+                res = res.data
+                if(res.code == 0) {
+                    for (let i=0; i < res.data.length; i++) {
+                        let item = res.data[i]
+                        if (item.hasAnswer) {
+                            this.finishList.push(item)
+                        } else {
+                            this.todoList.push(item)
+                        }
+                    }
+                } else {
+                    uni.showToast({
+                        icon: 'none',
+                        title: res.message,
+                        duration: 1000
                     })
                 }
             })
@@ -224,12 +256,44 @@ export default {
                 }
             })
         },
-        toQuestion(){
-             uni.navigateTo({
-                url: '/pages/question/question'
+        toQuestion(id){
+            if(this.userId) {
+                if(id == this.todoList[0].questionId) {
+                    uni.navigateTo({
+                        url: '/pages/question/question?id=' + id + "&hasAnswer=" + 0
+                    })
+                } else {
+                    uni.showToast({
+                        icon: 'none',
+                        title: '请按照顺序打卡学习',
+                        duration: 1000
+                    })
+                }
+            } else {
+                uni.showModal({
+                    content: '您未登录，请登录',
+                    showCancel: false,
+                    confirmText: '登录',
+                    success: function (res) {
+                        if (res.confirm) {
+                            uni.navigateTo({
+                                url: '/pages/mine/login'
+                            })
+                        }
+                    }
+                });
+            }
+        },
+        toDoneQuestion(id){
+            uni.navigateTo({
+                url: '/pages/question/question?id=' + id + "&hasAnswer=" + 1
+            })
+        },
+		createQuestion() {
+            uni.navigateTo({
+                url: '/pages/question/create-question?circleId=' + this.circleId
             })
         }
-		
 	}
 }
 </script>

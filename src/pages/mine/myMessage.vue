@@ -11,7 +11,11 @@
             </view>
             <view class="more">></view>
         </view>
-        <myList :circleList="circleList" :myTitle="listTitle"></myList>
+        <myList :circleList="circleList" :myTitle="listTitle" :userId="userId" :role="info.role + ''"></myList>
+        <div class="bottom">
+             <button @click="logout">退出登录</button>
+        </div>
+       
 	</view>
 	
 </template>
@@ -28,16 +32,16 @@ export default{
             userId: '',
             info: {},
             circleList: [],
-            listTitle: '我参与的圈子'
+            listTitle: '我参与的圈子',
 		}
-	},
+    },
 	onShow(){
         let that = this
         uni.getStorage({
             key: 'userId',
             success(e) {
-                this.userId = e.data
-                toolkit.post('/user/getInfo',{userId: this.userId}).then(res => {
+                that.userId = e.data + ''
+                toolkit.post('/user/getInfo',{userId: that.userId}).then(res => {
                     res = res.data
                     if(res.code == 0) {
                         that.info = res.data
@@ -50,7 +54,7 @@ export default{
                     }
                 })
                 // 我参与的圈子
-                toolkit.post('/circle/getMyCircle',{userId: this.userId}).then(res => {
+                toolkit.post('/circle/getMyCircle',{userId: that.userId}).then(res => {
                     res = res.data
                     if(res.code == 0) {
                         that.circleList = res.data
@@ -64,8 +68,23 @@ export default{
                 })
             },
             fail() {
-                uni.navigateTo({
-                    url: '/pages/mine/login'
+                uni.getStorage({
+                    key: 'hasLoad',
+                    success() {
+                        uni.removeStorage({
+                            key: 'hasLoad',
+                            success() {
+                                uni.switchTab({
+                                    url: '/pages/index/home'
+                                })
+                            }
+                        })
+                    },
+                    fail() {
+                        uni.navigateTo({
+                            url: '/pages/mine/login'
+                        })
+                    }
                 })
             }
         })
@@ -74,6 +93,23 @@ export default{
         toInfo(){
             uni.navigateTo({
                 url: '/pages/mine/info'
+            })
+        },
+        logout() {
+            uni.removeStorage({
+                key: 'userId',
+                success() {
+                    uni.showToast({
+                        icon: 'success',
+                        title: '退出成功',
+                        duration: 1000
+                    })
+                    setTimeout(() => {
+                        uni.reLaunch({
+                            url: '/pages/index/home'
+                        })
+                    }, 1000)
+                }
             })
         }
     }
@@ -102,5 +138,15 @@ export default{
             flex: auto;
             text-align: right;
         }
+    }
+    button {
+        background: green;
+        width: 80%;
+    }
+    .bottom {
+        bottom: 100px;
+        position: fixed;
+        width: 100%;
+        text-align: center;
     }
 </style>

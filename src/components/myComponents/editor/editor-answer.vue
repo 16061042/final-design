@@ -6,7 +6,7 @@
 					<view :class="formats.bold ? 'ql-active' : ''" class="iconfont icon-zitijiacu" data-name="bold"></view>
 					<view :class="formats.italic ? 'ql-active' : ''" class="iconfont icon-zitixieti" data-name="italic"></view>
 					<view :class="formats.underline ? 'ql-active' : ''" class="iconfont icon-zitixiahuaxian" data-name="underline"></view>
-					<view :class="formats.strike ? 'ql-active' : ''" class="iconfont icon-zitishanchuxian" data-name="strike"></view>
+					<!-- <view :class="formats.strike ? 'ql-active' : ''" class="iconfont icon-zitishanchuxian" data-name="strike"></view> -->
 					<view :class="formats.align === 'left' ? 'ql-active' : ''" class="iconfont icon-zuoduiqi" data-name="align"
 					 data-value="left"></view>
 					<view :class="formats.align === 'center' ? 'ql-active' : ''" class="iconfont icon-juzhongduiqi" data-name="align"
@@ -15,9 +15,9 @@
 					 data-value="right"></view>
 					<view :class="formats.align === 'justify' ? 'ql-active' : ''" class="iconfont icon-zuoyouduiqi" data-name="align"
 					 data-value="justify"></view>
-					<view :class="formats.lineHeight ? 'ql-active' : ''" class="iconfont icon-line-height" data-name="lineHeight"
-					 data-value="2"></view>
-					<view :class="formats.letterSpacing ? 'ql-active' : ''" class="iconfont icon-Character-Spacing" data-name="letterSpacing"
+					<!-- <view :class="formats.lineHeight ? 'ql-active' : ''" class="iconfont icon-line-height" data-name="lineHeight"
+					 data-value="2"></view> -->
+					<!-- <view :class="formats.letterSpacing ? 'ql-active' : ''" class="iconfont icon-Character-Spacing" data-name="letterSpacing"
 					 data-value="2em"></view>
 					<view :class="formats.marginTop ? 'ql-active' : ''" class="iconfont icon-722bianjiqi_duanqianju" data-name="marginTop"
 					 data-value="20px"></view>
@@ -44,9 +44,9 @@
 
 					<view class="iconfont icon-outdent" data-name="indent" data-value="-1"></view>
 					<view class="iconfont icon-indent" data-name="indent" data-value="+1"></view>
-					<view class="iconfont icon-fengexian" @tap="insertDivider"></view>
+					<view class="iconfont icon-fengexian" @tap="insertDivider"></view> -->
 					<view class="iconfont icon-charutupian" @tap="insertImage"></view>
-					<view :class="formats.header === 1 ? 'ql-active' : ''" class="iconfont icon-format-header-1" data-name="header"
+					<!-- <view :class="formats.header === 1 ? 'ql-active' : ''" class="iconfont icon-format-header-1" data-name="header"
 					 :data-value="1"></view>
 					<view :class="formats.script === 'sub' ? 'ql-active' : ''" class="iconfont icon-zitixiabiao" data-name="script"
 					 data-value="sub"></view>
@@ -54,12 +54,12 @@
 					 data-value="super"></view>
 					<view class="iconfont icon-shanchu" @tap="clear"></view>
 					<view :class="formats.direction === 'rtl' ? 'ql-active' : ''" class="iconfont icon-direction-rtl" data-name="direction"
-					 data-value="rtl"></view>
+					 data-value="rtl"></view> -->
 
 				</view>
-
-				<editor id="editor" class="ql-container" placeholder="开始输入..." showImgSize showImgToolbar showImgResize
-				 @statuschange="onStatusChange" :read-only="readOnly" @ready="onEditorReady">
+				<record @set="set"></record>
+				<editor id="editor1" class="ql-container" placeholder="开始输入..." showImgSize showImgToolbar showImgResize
+				 @statuschange="onStatusChange" :read-only="readOnly" @ready="onEditorReady" @input="editorChange">
 				</editor>
 			</view>
 		</view>
@@ -68,19 +68,32 @@
 </template>
 
 <script>
+import record from "../record"
 	export default {
+		components: {
+			record
+		},
 		data() {
 			return {
                 readOnly: false,
-				formats: {}
+				formats: {},
+				editorCtx: {}
 			}
 		},
 		methods: {
+			set(val) {
+				this.editorCtx.insertText({
+					text: val
+				})
+			},
+			editorChange(e) {
+				this.$emit('setData', e.detail.html)
+			},
 			readOnlyChange() {
 				this.readOnly = !this.readOnly
 			},
 			onEditorReady() {
-				uni.createSelectorQuery().select('#editor').context((res) => {
+				uni.createSelectorQuery().select('#editor1').context((res) => {
 					this.editorCtx = res.context
 				}).exec()
 			},
@@ -128,16 +141,34 @@
 				})
 			},
 			insertImage() {
+				let that = this
 				uni.chooseImage({
 					count: 1,
 					success: (res) => {
-						this.editorCtx.insertImage({
-							src: res.tempFilePaths[0],
-							alt: '图像',
-							success: function() {
-								console.log('insert image success')
+						const tempFilePaths = res.tempFilePaths;
+						uni.uploadFile({
+							url: 'http://account.5kong.com/api/common/uploadOss', 
+							filePath: tempFilePaths[0],
+							name: 'file',
+							success: function (res) {
+								res = JSON.parse(res.data)
+								if(res.code == 0) {
+									that.editorCtx.insertImage({
+										src: res.data.url,
+										alt: '图像',
+										success: function() {
+											console.log('insert image success')
+										}
+									})
+								} else {
+									uni.showToast({
+										icon: "none",
+										title: '上传失败',
+										duration: 1000
+									})
+								}
 							}
-						})
+						});
 					}
 				})
 			}
@@ -152,7 +183,7 @@
 </script>
 
 <style>
-	/* @import "./editor-icon.css"; */
+	@import "./editor-icon.css";
 	.wrapper {
 		padding: 5px;
 	}

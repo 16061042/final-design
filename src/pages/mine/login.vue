@@ -24,6 +24,12 @@ export default{
             password: ''
 		}
     },
+    onShow() {
+        uni.setStorage({
+            key: 'hasLoad',
+            data: true
+        })
+    },
     methods:{
         toredister(){
             uni.navigateTo({
@@ -83,9 +89,7 @@ export default{
             height: 30px;
             margin:0 0 15px 10px;
             font-size: 20px;
-
         }
-        
     }
     .input1{
             padding-top:30%;

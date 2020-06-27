@@ -12,7 +12,7 @@
             <view class="more">></view>
         </view>
         <myList :circleList="circleList" :myTitle="listTitle" :userId="userId" :role="info.role + ''"></myList>
-        <div class="bottom">
+        <div class="bottom1">
              <button @click="logout">退出登录</button>
         </div>
 	</view>
@@ -141,7 +141,7 @@ export default{
         background: green;
         width: 80%;
     }
-    .bottom {
+    .bottom1 {
         bottom: 100px;
         position: fixed;
         width: 100%;

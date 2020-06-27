@@ -15,9 +15,7 @@
         <div class="bottom">
              <button @click="logout">退出登录</button>
         </div>
-       
 	</view>
-	
 </template>
 
 <script>
